@@ -32,6 +32,7 @@ export interface SearchResult {
   verse: number;
   text: string;
   textEn: string;
+  keywords?: string[];
 }
 
 // Type assertions for imported JSON
@@ -124,8 +125,8 @@ export function searchBible(query: string): SearchResult[] {
       continue;
     }
     
-    // Search in keywords
-    if (entry.keywords?.some(kw => kw.toLowerCase().includes(lowerQuery))) {
+    // Search in keywords (if available)
+    if (entry.keywords && Array.isArray(entry.keywords) && entry.keywords.some((kw: string) => kw.toLowerCase().includes(lowerQuery))) {
       results.push(entry);
     }
   }
