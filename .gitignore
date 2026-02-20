@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Bible data files (too large for git)
+src/data/kjvBible.json
+src/data/bibleSearchIndex.json
+doc/
