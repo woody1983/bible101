@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  /* 主色调 - 温暖宁静的圣经学习氛围 */
+  --color-primary: #8B7355;
+  --color-primary-light: #A68B6A;
+  --color-primary-dark: #6B5344;
+  
+  /* 辅助色 */
+  --color-secondary: #D4C4A8;
+  --color-accent: #C9A227;
+  --color-accent-light: #E8D5A3;
+  
+  /* 背景色 */
+  --color-bg-primary: #FDF8F0;
+  --color-bg-secondary: #F5EFE6;
+  --color-bg-card: #FFFFFF;
+  
+  /* 文字色 */
+  --color-text-primary: #3D3229;
+  --color-text-secondary: #6B5D4D;
+  --color-text-muted: #9A8B7A;
+  
+  /* 功能色 */
+  --color-success: #6B8E6B;
+  --color-warning: #D4A574;
+  --color-error: #B8716B;
+  --color-info: #6B8FA8;
+}
+
+/* 字体 */
+@layer base {
+  html {
+    font-family: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Noto Serif SC", "Crimson Text", serif;
+  }
+}
+
+/* 基础样式 */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
