@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+# Bible101 - 现代化圣经学习平台
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 📖 深入理解圣经，从每一章开始
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ 核心特点
 
-## React Compiler
+### 🎯 结构化学习
+告别零散的经文阅读，采用"**章节即单元**"的学习理念。每一章都配有完整的上下文解析，帮助你系统性地理解圣经。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 📝 智能考官模式
+不只是阅读，更是思考。基于章节内容**自动生成问答题**，涵盖：
+- **记忆** - 关键经文回顾
+- **理解** - 章节主旨把握
+- **分析** - 深层关系探索
+- **应用** - 生活实践思考
 
-## Expanding the ESLint configuration
+### 🎨 沉浸式体验
+**Sacred Modernism** 设计风格：
+- 清新自然的配色（抹茶绿、水蓝、薰衣草紫）
+- 玻璃拟态导航栏
+- 衬线字体呈现经文，优雅而永恒
+- 大量留白，让心灵安静
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📱 随时随地
+响应式设计，完美支持：
+- 桌面浏览器
+- 平板设备
+- 手机移动端
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 主要功能
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| 功能 | 描述 |
+|------|------|
+| 📖 **中英对照阅读** | 66卷书，1189章，和合本 + KJV 对照 |
+| 🎲 **每日随机经文** | 优先诗篇、箴言，每日灵粮 |
+| 📝 **考官模式** | AI 生成问答题，检验学习成果 |
+| 🔖 **学习进度** | 自动记录阅读进度，支持书签 |
+| 🔍 **全文搜索** | 快速查找书卷、章节 |
+| ⚙️ **个性化设置** | 字体大小、主题切换 |
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠️ 技术亮点
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **React 18** + **TypeScript** - 类型安全，开发高效
+- **TDD 开发模式** - 先测试后实现，确保代码质量
+- **静态 JSON 数据** - 无需后端，离线可用
+- **Zustand 状态管理** - 轻量级，易于维护
+
+---
+
+## 📚 项目文档
+
+- [架构文档](./ARCHITECTURE.md) - 全局架构地图和开发规范
+- [开发文档](./Bible101_开发文档.md) - 详细的产品需求文档
+
+---
+
+## 🤝 参与贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+**开发规范：**
+- 遵循 TDD 模式（先写测试，后写实现）
+- 阅读 [ARCHITECTURE.md](./ARCHITECTURE.md) 了解项目结构
+- 大功能请先开 Issue 讨论
+
+---
+
+## 📄 许可证
+
+MIT License
+
+---
+
+> 💡 **提示**：本项目数据文件（KJV Bible）较大，开发时请查看 ARCHITECTURE.md 了解数据获取方式。
