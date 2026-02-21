@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
-import { getBookById, sampleChapter } from '../data/bibleData';
+import { getBookById } from '../data/bibleData';
+import { getChapter, getBook } from '../lib/bibleParser';
 import { ChevronLeft, ChevronRight, BookOpen, Clock, Heart, Share2 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 
@@ -10,10 +11,9 @@ export function ChapterPage() {
   const book = bookId ? getBookById(bookId) : null;
   const chapterNum = parseInt(chapterNumber || '1', 10);
   
-  // 使用示例数据（诗篇 23 篇）或显示基础框架
-  const chapter = bookId === 'psalms' && chapterNum === 23 
-    ? sampleChapter 
-    : null;
+  // 从 KJV Bible 数据获取章节内容
+  const kjvBook = bookId ? getBook(bookId) : null;
+  const kjvChapter = bookId ? getChapter(bookId, chapterNum) : null;
   
   if (!book) {
     return (
@@ -62,7 +62,7 @@ export function ChapterPage() {
           </div>
           
           <h1 className="text-3xl md:text-4xl font-bold text-[#3D3229] mb-3">
-            {chapter?.title || `${book.name} 第 ${chapterNum} 章`}
+            {`${book.name} 第 ${chapterNum} 章`}
           </h1>
           
           <div className="flex items-center gap-4 text-[#9A8B7A]">
@@ -90,173 +90,53 @@ export function ChapterPage() {
           </div>
         </header>
         
-        {chapter ? (
+        {kjvChapter && kjvChapter.verses.length > 0 ? (
           <div className="space-y-8">
-            {/* 核心句子 */}
+            {/* 经文内容 */}
             <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#D4C4A8]/50">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 bg-[#C9A227] rounded-lg flex items-center justify-center">
                   <span className="text-white text-sm font-bold">经</span>
                 </div>
-                <h2 className="text-xl font-bold text-[#3D3229]">核心句子</h2>
+                <h2 className="text-xl font-bold text-[#3D3229]">经文内容</h2>
               </div>
               
               <div className="space-y-6">
-                {chapter.keyVerses.map((verse) => (
-                  <div key={verse.id} className="border-l-4 border-[#C9A227] pl-4">
+                {kjvChapter.verses.map((verse) => (
+                  <div key={verse.verse} className="border-l-4 border-[#C9A227] pl-4">
                     <div className="text-sm text-[#8B7355] font-medium mb-2">
-                      第 {verse.verseNumber} 节
+                      第 {verse.verse} 节
                     </div>
                     <blockquote className="text-lg md:text-xl text-[#3D3229] font-serif leading-relaxed mb-3">
                       {verse.text}
                     </blockquote>
                     
-                    <div className="text-[#9A8B7A] italic mb-2">
+                    <div className="text-[#9A8B7A] italic">
                       {verse.textEn}
                     </div>
-                    
-                    <div className="bg-[#F5EFE6] rounded-lg p-3 text-sm text-[#6B5D4D]">
-                      <span className="text-[#C9A227]">💡</span> {verse.explanation}
-                    </div>
                   </div>
                 ))}
               </div>
             </section>
             
-            {/* 关键观点 */}
-            <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#D4C4A8]/50">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-[#8B7355] rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">观</span>
-                </div>
-                <h2 className="text-xl font-bold text-[#3D3229]">关键观点</h2>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                {chapter.keyPoints.map((point) => (
-                  <div key={point.id} className="bg-[#FDF8F0] rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">
-                        {point.icon === 'shepherd' && '🐑'}
-                        {point.icon === 'compass' && '🧭'}
-                        {point.icon === 'heart' && '❤️'}
-                      </span>
-                      <h3 className="font-bold text-[#3D3229]">{point.title}</h3>
-                    </div>
-                    <p className="text-[#6B5D4D] text-sm leading-relaxed">
-                      {point.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-            
-            {/* 考点解析 */}
+            {/* 章节信息 */}
             <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#D4C4A8]/50">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 bg-[#6B8FA8] rounded-lg flex items-center justify-center">
                   <span className="text-white text-sm font-bold">解</span>
                 </div>
-                <h2 className="text-xl font-bold text-[#3D3229]">考点解析</h2>
+                <h2 className="text-xl font-bold text-[#3D3229]">章节信息</h2>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-[#3D3229] mb-2 flex items-center gap-2">
-                    <span>📖</span> 历史背景
-                  </h3>
-                  <p className="text-[#6B5D4D] leading-relaxed">{chapter.studyNotes.historicalContext}</p>
+                  <h3 className="font-bold text-[#3D3229] mb-2">书卷</h3>
+                  <p className="text-[#6B5D4D]">{kjvBook?.name} ({kjvBook?.nameEn})</p>
                 </div>
                 
                 <div>
-                  <h3 className="font-bold text-[#3D3229] mb-2 flex items-center gap-2">
-                    <span>🌍</span> 文化语境
-                  </h3>
-                  <p className="text-[#6B5D4D] leading-relaxed">{chapter.studyNotes.culturalContext}</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold text-[#3D3229] mb-2 flex items-center gap-2">
-                    <span>⭐</span> 神学主题
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {chapter.studyNotes.theologicalThemes.map((theme, idx) => (
-                      <span 
-                        key={idx}
-                        className="bg-[#C9A227]/10 text-[#8B7355] px-3 py-1 rounded-full text-sm"
-                      >
-                        {theme}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold text-[#3D3229] mb-2 flex items-center gap-2">
-                    <span>📖</span> 交叉引用
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {chapter.studyNotes.crossReferences.map((ref, idx) => (
-                      <span 
-                        key={idx}
-                        className="text-[#8B7355] hover:underline cursor-pointer"
-                      >
-                        {ref.book} {ref.chapter}:{ref.verses}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-            
-            {/* 应用思考 */}
-            <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#D4C4A8]/50">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-[#6B8E6B] rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">用</span>
-                </div>
-                <h2 className="text-xl font-bold text-[#3D3229]">应用思考</h2>
-              </div>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-bold text-[#3D3229] mb-3 flex items-center gap-2">
-                    <span>🤔</span> 个人反思
-                  </h3>
-                  <ul className="space-y-2">
-                    {chapter.application.personalQuestions.map((q) => (
-                      <li key={q.id} className="text-[#6B5D4D] flex items-start gap-2">
-                        <span className="text-[#8B7355]">•</span>
-                        {q.question}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-bold text-[#3D3229] mb-3 flex items-center gap-2">
-                    <span>👥</span> 小组讨论
-                  </h3>
-                  <ul className="space-y-2">
-                    {chapter.application.groupQuestions.map((q) => (
-                      <li key={q.id} className="text-[#6B5D4D] flex items-start gap-2">
-                        <span className="text-[#8B7355]">•</span>
-                        {q.question}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div className="bg-[#6B8E6B]/10 rounded-xl p-4">
-                  <h3 className="font-bold text-[#3D3229] mb-3">实践建议</h3>
-                  <ul className="space-y-2">
-                    {chapter.application.practicalSteps.map((step, idx) => (
-                      <li key={idx} className="text-[#6B5D4D] flex items-start gap-2">
-                        <span className="text-[#6B8E6B]">✓</span>
-                        {step}
-                      </li>
-                    ))}
-                  </ul>
+                  <h3 className="font-bold text-[#3D3229] mb-2">章节</h3>
+                  <p className="text-[#6B5D4D]">第 {chapterNum} 章，共 {kjvChapter.verses.length} 节</p>
                 </div>
               </div>
             </section>
