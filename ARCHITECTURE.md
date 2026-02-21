@@ -52,9 +52,37 @@
 |-------|----------|------|
 | `bug` | `#tdd#` + 紧急 | 程序报错或逻辑不符，需紧急修复 |
 | `documentation` | `#doc#` | 架构文档、README、ADR、注释修改 |
-| `enhancement` | `#plan#` | 现有功能优化或新特性添加 |
+| `enhancement` | `#plan#` + **必须开新分支** | 现有功能优化或新特性添加 |
 | `question` | 暂停开发 | 需求有疑问，等待用户澄清 |
 | `wontfix` | 立即停止 | 决定不做，记录原因后停止 |
+
+**⚠️ 重要：enhancement 标签的强制分支规则**
+
+带有 `enhancement` 标签的 Issue **必须**创建新的功能分支进行开发，禁止在当前分支或完全不相关的分支上直接开发。
+
+#### 分支命名规范
+```
+feature/issue-{number}-{short-description}
+```
+
+**示例：**
+- `feature/issue-16-search-function`
+- `feature/issue-17-exam-optimize`
+
+#### 违规后果
+- ❌ **禁止** 在 `main` 分支直接开发 enhancement
+- ❌ **禁止** 在 `review/issue-XX` 分支开发不相关的 enhancement
+- ❌ **禁止** 在已关闭的 Issue 分支上继续开发新功能
+- ✅ **必须** 每个 enhancement Issue 都有独立的分支
+
+#### 工作流程
+```
+1. 识别到 enhancement 标签
+2. 创建新分支：git checkout -b feature/issue-{number}-{description}
+3. 在新分支上进行开发
+4. 提交并推送到远程
+5. 创建 PR 关联 Issue
+```
 
 ### 0.6 Priority 关键字规则
 
