@@ -1,6 +1,9 @@
 import { useAppStore } from '../stores/appStore';
 import { allCategories, getBookById } from '../data/bibleData';
 import type { BibleCategory, BibleBook } from '../types';
+import { RandomVerseCard } from '../components/features/RandomVerseCard';
+import { useRandomVerse } from '../hooks/useRandomVerse';
+import { getAllBooks } from '../lib/bibleParser';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -9,6 +12,10 @@ export function HomePage() {
   
   // 获取当前阅读的书卷信息
   const currentBook = currentBookId ? getBookById(currentBookId) : null;
+  
+  // 获取所有书卷用于随机经文
+  const allBooks = getAllBooks();
+  const { verse, isLoading, refresh } = useRandomVerse({ books: allBooks });
   
   // 获取推荐章节（示例）
   const recommendations = [
@@ -20,6 +27,15 @@ export function HomePage() {
   return (
     <div className="min-h-screen bg-[#FDF8F0] pt-20 pb-24 md:pb-8">
       <div className="max-w-7xl mx-auto px-4 space-y-8">
+        {/* 随机经文区域 */}
+        <section className="pt-4">
+          <RandomVerseCard 
+            verse={verse} 
+            onRefresh={refresh}
+            isLoading={isLoading}
+          />
+        </section>
+        
         {/* 欢迎区域 */}
         <section className="bg-gradient-to-r from-[#8B7355] to-[#A68B6A] rounded-2xl p-6 md:p-8 text-white">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">

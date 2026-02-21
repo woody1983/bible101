@@ -1,12 +1,16 @@
 import { useParams, Link } from 'react-router-dom';
 import { getBookById } from '../data/bibleData';
 import { getChapter, getBook } from '../lib/bibleParser';
-import { ChevronLeft, ChevronRight, BookOpen, Clock, Heart, Share2 } from 'lucide-react';
+import { generateDeepQuestions } from '../lib/examGeneratorV2';
+import { ExamMode } from '../components/features/ExamMode';
+import { ChevronLeft, ChevronRight, BookOpen, Clock, Heart, Share2, HelpCircle } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
+import { useState } from 'react';
 
 export function ChapterPage() {
   const { bookId, chapterNumber } = useParams<{ bookId: string; chapterNumber: string }>();
   const { addBookmark, bookmarks } = useAppStore();
+  const [showExam, setShowExam] = useState(false);
   
   const book = bookId ? getBookById(bookId) : null;
   const chapterNum = parseInt(chapterNumber || '1', 10);
@@ -14,6 +18,9 @@ export function ChapterPage() {
   // 从 KJV Bible 数据获取章节内容
   const kjvBook = bookId ? getBook(bookId) : null;
   const kjvChapter = bookId ? getChapter(bookId, chapterNum) : null;
+  
+  // 生成深度思考题（不是记忆题）
+  const examQuestions = bookId && kjvBook ? generateDeepQuestions(bookId, kjvBook.name, chapterNum, kjvChapter) : [];
   
   if (!book) {
     return (
@@ -158,6 +165,36 @@ export function ChapterPage() {
                 诗篇 23 篇（示例章节）
               </Link>
             </div>
+          </div>
+        )}
+        
+        {/* 考官模式切换按钮 */}
+        {examQuestions.length > 0 && (
+          <div className="mt-8">
+            <button
+              onClick={() => setShowExam(!showExam)}
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-medium transition-all"
+              style={{
+                backgroundColor: showExam ? '#F5EFE6' : '#8B7355',
+                color: showExam ? '#8B7355' : '#FFFFFF',
+              }}
+            >
+              <HelpCircle size={20} />
+              {showExam ? '返回阅读模式' : `开始考官模式 (${examQuestions.length} 题)`}
+            </button>
+          </div>
+        )}
+        
+        {/* 考官模式 */}
+        {showExam && examQuestions.length > 0 && (
+          <div className="mt-8">
+          <ExamMode
+            bookName={book.name}
+            bookId={book.id}
+            chapter={chapterNum}
+            questions={examQuestions}
+            onComplete={() => console.log('Exam completed')}
+          />
           </div>
         )}
         
