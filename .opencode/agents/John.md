@@ -1,7 +1,7 @@
 ---
 description: Senior React/TypeScript developer specializing in Bible101 codebase
-mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+mode: primary
+##model: kimi-k2-thinking
 temperature: 0.3
 tools:
   write: true
