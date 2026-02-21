@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle, Download, Edit2 } from 'lucide-react';
 import { colors } from '../../styles/colors';
 import { examStorage, type ExamAnswer } from '../../lib/examStorage';
@@ -12,20 +12,43 @@ interface ExamModeProps {
   onComplete?: () => void;
 }
 
-export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: ExamModeProps) {
+export const ExamMode = React.memo(function ExamMode({ 
+  bookName, 
+  bookId, 
+  chapter, 
+  questions, 
+  onComplete 
+}: ExamModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<string, ExamAnswer>>({});
   const [isCompleted, setIsCompleted] = useState(false);
-  const [startTime] = useState(Date.now());
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const currentQuestion = questions[currentIndex];
-  const totalQuestions = questions.length;
-  const progress = ((currentIndex + 1) / totalQuestions) * 100;
+  // Fix SSR issue: Initialize Date.now() in useEffect
+  useEffect(() => {
+    setStartTime(Date.now());
+  }, []);
 
-  // 加载已保存的答案
+  // Memoized derived values
+  const currentQuestion = useMemo(() => 
+    questions[currentIndex], 
+    [questions, currentIndex]
+  );
+  
+  const totalQuestions = useMemo(() => 
+    questions.length, 
+    [questions]
+  );
+  
+  const progress = useMemo(() => 
+    totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0,
+    [currentIndex, totalQuestions]
+  );
+
+  // Load saved answers
   useEffect(() => {
     const loadSavedAnswers = async () => {
       try {
@@ -52,14 +75,15 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
     loadSavedAnswers();
   }, [bookId, chapter]);
 
-  const handleAnswer = (answer: string) => {
+  const handleAnswer = useCallback((answer: string) => {
+    if (!currentQuestion) return;
     setAnswers((prev) => ({
       ...prev,
       [currentQuestion.id]: answer,
     }));
-  };
+  }, [currentQuestion?.id]);
 
-  const saveCurrentAnswer = async () => {
+  const saveCurrentAnswer = useCallback(async () => {
     const answerText = answers[currentQuestion.id];
     if (!answerText) return;
 
@@ -82,9 +106,9 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
     } catch (error) {
       console.error('Failed to save answer:', error);
     }
-  };
+  }, [answers, currentQuestion, bookId, bookName, chapter]);
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     await saveCurrentAnswer();
     
     if (currentIndex < totalQuestions - 1) {
@@ -94,49 +118,49 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
       setIsCompleted(true);
       onComplete?.();
     }
-  };
+  }, [currentIndex, totalQuestions, saveCurrentAnswer, onComplete]);
 
-  const handlePrevious = async () => {
+  const handlePrevious = useCallback(async () => {
     await saveCurrentAnswer();
     
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
       setIsEditing(false);
     }
-  };
+  }, [currentIndex, saveCurrentAnswer]);
 
-  const handleExport = async () => {
+  const handleExport = useCallback(async () => {
     try {
       const csv = await examStorage.exportToCSV();
       examStorage.downloadCSV(csv, `${bookName}_${chapter}_answers.csv`);
     } catch (error) {
       console.error('Failed to export:', error);
     }
-  };
+  }, [bookName, chapter]);
 
-  const handleDoubleClick = () => {
-    if (savedAnswers[currentQuestion.id]) {
+  const handleDoubleClick = useCallback(() => {
+    if (currentQuestion && savedAnswers[currentQuestion.id]) {
       setIsEditing(true);
     }
-  };
+  }, [savedAnswers, currentQuestion?.id]);
 
-  const getCategoryLabel = (category: ExamQuestionV2['category']) => {
+  const getCategoryLabel = useCallback((category: ExamQuestionV2['category']) => {
     const labels = {
       reflection: '反思',
       application: '应用',
       understanding: '理解',
     };
     return labels[category];
-  };
+  }, []);
 
-  const getCategoryColor = (category: ExamQuestionV2['category']) => {
+  const getCategoryColor = useCallback((category: ExamQuestionV2['category']) => {
     const colors_map = {
       reflection: colors.secondary.DEFAULT,
       application: colors.primary.DEFAULT,
       understanding: colors.accent.purple,
     };
     return colors_map[category];
-  };
+  }, []);
 
   if (isLoading) {
     return (
@@ -161,7 +185,7 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
 
   if (isCompleted) {
     const answeredCount = Object.keys(savedAnswers).length;
-    const duration = Math.floor((Date.now() - startTime) / 1000);
+    const duration = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
     const minutes = Math.floor(duration / 60);
     const seconds = duration % 60;
 
@@ -217,7 +241,6 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between p-4 rounded-xl"
         style={{ backgroundColor: colors.glass.white }}
       >
@@ -236,7 +259,6 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="h-2 rounded-full overflow-hidden"
         style={{ backgroundColor: colors.primary.light }}
       >
@@ -249,14 +271,12 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
         />
       </div>
 
-      {/* Question Card */}
       <div className="rounded-2xl p-6 md:p-8"
         style={{ 
           backgroundColor: colors.background.DEFAULT,
           border: `1px solid ${colors.primary.light}`,
         }}
       >
-        {/* Question Meta */}
         <div className="flex items-center gap-3 mb-6">
           <span
             className="px-3 py-1 rounded-full text-sm font-medium"
@@ -282,7 +302,6 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
           )}
         </div>
 
-        {/* Question Text */}
         <h3 className="text-xl md:text-2xl font-medium mb-4 leading-relaxed"
           style={{ color: colors.text.primary }}
         >
@@ -297,7 +316,6 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
           </p>
         )}
 
-        {/* Answer Input */}
         <div onDoubleClick={handleDoubleClick}>
           <textarea
             value={answers[currentQuestion.id] || ''}
@@ -321,7 +339,6 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
         </div>
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center justify-between">
         <button
           onClick={handlePrevious}
@@ -350,4 +367,4 @@ export function ExamMode({ bookName, bookId, chapter, questions, onComplete }: E
       </div>
     </div>
   );
-}
+});
