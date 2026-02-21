@@ -203,6 +203,14 @@ export function getVerseContext(
   return chapterData.verses.slice(startIdx, endIdx);
 }
 
+/**
+ * 根据书卷 ID 获取中文书卷名
+ */
+export function getBookNameCN(bookId: string): string {
+  const book = bookMap.get(bookId);
+  return book?.name || bookId;
+}
+
 export default {
   getVerse,
   getChapter,
@@ -213,5 +221,6 @@ export default {
   getAllBooks,
   getTotalVerseCount,
   formatReference,
-  getVerseContext
+  getVerseContext,
+  getBookNameCN
 };
