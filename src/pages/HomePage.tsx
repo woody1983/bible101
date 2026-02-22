@@ -2,6 +2,7 @@ import { useAppStore } from '../stores/appStore';
 import { allCategories, getBookById } from '../data/bibleData';
 import type { BibleCategory, BibleBook } from '../types';
 import { RandomVerseCard } from '../components/features/RandomVerseCard';
+import { PrayerModule } from '../components/features/PrayerModule/PrayerModule';
 import { useRandomVerse } from '../hooks/useRandomVerse';
 import { getAllBooks } from '../lib/bibleParser';
 import { ChevronRight, BookOpen } from 'lucide-react';
@@ -34,6 +35,11 @@ export function HomePage() {
             onRefresh={refresh}
             isLoading={isLoading}
           />
+        </section>
+        
+        {/* 祷告模块 */}
+        <section>
+          <PrayerModule />
         </section>
         
         {/* 欢迎区域 */}
