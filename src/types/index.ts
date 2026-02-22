@@ -100,3 +100,25 @@ export interface ChapterSummary {
   title: string;
   preview?: string;
 }
+
+// 搜索建议
+export interface SearchSuggestion {
+  type: 'book' | 'chapter' | 'verse';
+  reference: string;
+  text: string;
+  bookId?: string;
+  chapter?: number;
+  verse?: number;
+}
+
+// 搜索结果（用于搜索结果展示）
+export interface SearchResult {
+  verse: {
+    book: string;
+    chapter: number;
+    verse: number;
+    text: string;
+  };
+  score: number;
+  snippet: string;
+}
